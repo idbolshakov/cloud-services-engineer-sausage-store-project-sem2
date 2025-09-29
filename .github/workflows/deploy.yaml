@@ -120,7 +120,7 @@ jobs:
       - name: Install Helm
         uses: azure/setup-helm@v1
         with:
-          version: v3.18.2
+          version: v3.14.2
 
       - name: Add kubeconfig
         run: |
@@ -135,11 +135,17 @@ jobs:
             --password "${{ env.NEXUS_HELM_REPO_PASSWORD }}"
           helm repo update
 
+      - name: Install Yandex Cloud CLI
+        run: |
+          curl -sSL https://storage.yandexcloud.net/yandexcloud-yc/install.sh | bash
+          export PATH="$HOME/yandex-cloud/bin:$PATH"
+          source "/home/runner/.bashrc"
+
       - name: Deploy Helm Chart
         run: |
           helm upgrade --install sausage-store chartmuseum/sausage-store-chart \
             --version ${{ needs.add_helm_chart_to_nexus.outputs.chart_version }} \
-            --namespace $SAUSAGE_STORE_NAMESPACE \
+            --namespace r-devops-magistracy-project-2sem-471761 \
             --set-string backend.image_tag="latest" \
             --set-string frontend.image_tag="latest" \
             --set-string backend-report.image_tag="latest" 
